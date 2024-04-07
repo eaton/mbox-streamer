@@ -32,7 +32,7 @@ export class MboxTransformer extends Transform {
       this.emit('data', this.remaining)
       this.remaining = '';
       callback();
-      this.emit('close')
+      this.emit('close');
     }
   }
 }

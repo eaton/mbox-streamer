@@ -47,6 +47,7 @@
   "dependencies": {
     "@types/mailparser": "^3.4.4",
     "mailparser": "^3.6.9",
+    "p-wait-for": "^5.0.2",
     "tiny-typed-emitter": "^2.1.0"
   }
 }
