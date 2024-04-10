@@ -45,6 +45,9 @@ export class MboxStreamer extends TypedEmitter<MboxStreamerEvents> {
 
     return pWaitFor<number>(
       () => this.total > 0 && this.inProgress === 0,
-    );
+    ).then(() => {
+      this.emit('finish', this.total);
+      return this.total;
+    });
   }
 }
