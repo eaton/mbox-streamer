@@ -7,9 +7,9 @@ import pWaitFor from 'p-wait-for';
 
 
 interface MboxStreamerEvents {
-  message: (message: ParsedMail) => void;
+  message: (message: ParsedMail, processed: number) => void;
   error: (err: any) => void;
-  finish: (total: number) => void;
+  finish: (processed: number) => void;
 }
 
 export class MboxStreamer extends TypedEmitter<MboxStreamerEvents> {
@@ -37,7 +37,7 @@ export class MboxStreamer extends TypedEmitter<MboxStreamerEvents> {
         if (err) {
           this.emit('error', err);
         } else {
-          this.emit('message', mail);
+          this.emit('message', mail, this.total);
         }
         this.inProgress--;
       });
