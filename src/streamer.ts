@@ -7,7 +7,7 @@ import pWaitFor from 'p-wait-for';
 
 
 interface MboxStreamerEvents {
-  message: (message: ParsedMail, processed: number, bytes: number) => void;
+  message: (message: ParsedMail, processed: number, messageBytes: number, totalBytesRead: number) => void;
   error: (err: any) => void;
   finish: (processed: number, bytes: number) => void;
 }
@@ -15,7 +15,7 @@ interface MboxStreamerEvents {
 export class MboxStreamer extends TypedEmitter<MboxStreamerEvents> {
   total = 0;
   inProgress = 0;
-  bytes = 0;
+  totalBytes = 0;
 
   constructor() {
     super();
@@ -33,12 +33,12 @@ export class MboxStreamer extends TypedEmitter<MboxStreamerEvents> {
     mbox.on('data', (message: string, bytes: number) => {
       this.total++;
       this.inProgress++;
-      this.bytes = bytes;
+      this.totalBytes = bytes;
       simpleParser(message, { keepCidLinks: true }, (err, mail) => {
         if (err) {
           this.emit('error', err);
         } else {
-          this.emit('message', mail, this.total, this.bytes);
+          this.emit('message', mail, this.total, stringLength(message), this.totalBytes);
         }
         this.inProgress--;
       });
@@ -47,8 +47,12 @@ export class MboxStreamer extends TypedEmitter<MboxStreamerEvents> {
     return pWaitFor<number>(
       () => this.total > 0 && this.inProgress === 0,
     ).then(() => {
-      this.emit('finish', this.total, this.bytes);
+      this.emit('finish', this.total, this.totalBytes);
       return this.total;
     });
   }
+}
+
+function stringLength(input: string) {
+  return Buffer.from(input).length
 }
